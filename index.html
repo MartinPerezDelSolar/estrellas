@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generar Fondo con Degradado en JavaScript</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: relative; /* Agregado para posicionar los círculos */
+    }
+
+    .circle {
+        position: absolute;
+        background-color: white;
+        border-radius: 50%;
+        transition: left 0.4s, top 0.4s; /* Transiciones para left y top */
+    }
+</style>
+</head>
+<body>
+    <script>
+        let colorCentro = '0, 0, 12'; // Azul oscuro en RGB
+        let colorBorde = '0, 77, 153'; // Azul marino claro en RGB
+        const radioGradiente = 3000; // Radio del gradiente en px
+        const velocidad = -1; // Velocidad de movimiento en píxeles
+
+        function actualizarColorCentro(color) {
+            colorCentro = color;
+            actualizarFondo();
+        }
+
+        function actualizarColorBorde(color) {
+            colorBorde = color;
+            actualizarFondo();
+        }
+
+        function actualizarFondo() {
+            const gradient = `radial-gradient(circle ${radioGradiente}px at center, rgb(${colorCentro}), rgb(${colorBorde}))`;
+            document.body.style.background = gradient;
+        }
+
+        function moverCirculo(circle) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const currentX = parseFloat(circle.style.left.replace('px', ''));
+            const currentY = parseFloat(circle.style.top.replace('px', ''));
+            const deltaX = centerX - currentX;
+            const deltaY = centerY - currentY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const unitX = deltaX / distance;
+            const unitY = deltaY / distance;
+            const newX = currentX + unitX * velocidad;
+            const newY = currentY + unitY * velocidad;
+
+            // Actualizar la posición del círculo
+            circle.style.left = `${newX}px`;
+            circle.style.top = `${newY}px`;
+
+            // Verificar si el círculo está en el borde de la pantalla
+            if (currentX <= 0 || currentX >= window.innerWidth || currentY <= 0 || currentY >= window.innerHeight) {
+                // Mover el círculo a una posición aleatoria dentro de un radio de 100 píxeles del centro
+                const angle = Math.random() * Math.PI * 2; // Ángulo aleatorio
+                const radius = Math.random() * 100; // Radio aleatorio hasta 100
+                const newX = centerX + Math.cos(angle) * radius;
+                const newY = centerY + Math.sin(angle) * radius;
+                circle.style.left = `${newX}px`;
+                circle.style.top = `${newY}px`;
+            }
+
+            // Llamar a la función moverCirculo de nuevo en el siguiente cuadro de animación
+            requestAnimationFrame(() => moverCirculo(circle));
+        }
+
+        // Generar círculos
+        for (let i = 0; i < 150; i++) {
+            const circleSize = Math.floor(Math.random() * 4) + 2; // Tamaño entre 2 y 5
+            const circle = document.createElement('div');
+            circle.classList.add('circle');
+            circle.style.width = `${circleSize}px`;
+            circle.style.height = `${circleSize}px`;
+            circle.style.top = `${Math.random() * window.innerHeight}px`;
+            circle.style.left = `${Math.random() * window.innerWidth}px`;
+            document.body.appendChild(circle);
+
+            // Iniciar el movimiento del círculo
+            moverCirculo(circle);
+        }
+
+        // Inicializar el fondo
+        actualizarFondo();
+    </script>
+</body>
+</html>
